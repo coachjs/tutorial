@@ -7,5 +7,15 @@ module.exports= app =>{
     // read all
     router.get("/",tutorials.findAll);
 
+    // update
+    router.put("/:id",tutorials.update)
+    // delete
+    router.delete("/:id",tutorials.delete)
+
+    // create comment
+    router.post("/comments",tutorials.createComment);
+
     app.use("/api/tutorials",router);
+
+
 }

@@ -1,5 +1,6 @@
 const db = require("../models")
 const Tutorial = db.tutorials;
+const Comment = db.comments;
 const Op = db.Sequelize.Op;
 
 // Create
@@ -29,11 +30,16 @@ exports.create = (req,res)=>{
     });
 }
 
+
+// read all
 exports.findAll = (req,res) => {
     const title = req.query.title;
     var condition = title ? {title: {[Op.like]: `%${title}%`}}:null;
 
-    Tutorial.findAll({where:condition}).then(data=>{
+    Tutorial.findAll({
+        where:condition,
+        include:["comments"]
+    }).then(data=>{
         res.send(data);
     }).catch(err=>{
         res.status(500).send({
@@ -41,3 +47,67 @@ exports.findAll = (req,res) => {
         });
     });
 }
+
+// update
+exports.update=(req,res)=>{
+    const id = req.params.id
+    Tutorial.update(req.body,{
+        where: {id: id}
+    }).then(num=>{
+        if (num == 1){
+            res.send({
+                message : "Tutorial sukses di update"
+            });
+        }else{
+            res.send({
+                message : "tidak bisa diupdate"
+            });
+        }
+    }).catch(err=>{
+        res.status(500).send({
+            message : "server error"
+        });
+    });
+}
+
+// delete
+exports.delete = (req,res)=>{
+    const id = req.params.id
+    Tutorial.destroy({
+        where: {id : id}
+    }).then(num => {
+        if (num == 1){
+            res.send({
+                message : "berhasil delete"
+            })
+        }else{
+            res.send({
+                message : "tidak berhasil delete"
+            })
+        }
+    }).catch(err =>{
+        res.status(500).send({
+            message : "tidak berhasil delete. server error"
+        })
+    })
+}
+
+// create comment
+exports.createComment = (req,res)=>{
+    const comment = {
+        tutorialId : req.body.tutorialId,
+        name : req.body.name,
+        text : req.body.text
+    };
+
+    Comment.create(comment).then(data =>{
+        res.send(data);
+    }).catch(err=>{
+        res.status(500).send({
+            message : err.message || "error"
+        });
+    });
+
+}
+
+

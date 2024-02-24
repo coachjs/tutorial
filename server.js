@@ -15,7 +15,7 @@ app.use(express.urlencoded({extended: true}))
 
 // sync database
 const db = require("./app/models")
-db.sequelize.sync({force:true}).then(()=>{
+db.sequelize.sync({force:false}).then(()=>{
     console.log("sync db")
 }).catch((err)=>{
     console.log(`failed to sync karena ${err.message}`)
@@ -24,7 +24,7 @@ db.sequelize.sync({force:true}).then(()=>{
 // route /
 app.get("/",(req,res)=>{
     res.json({
-        message : "Selamat datang di tutorial"
+        message : "Selamat datang di tutorial ini nodemon"
     })
 })
 
