@@ -1,6 +1,7 @@
 const db = require("../models")
 const Tutorial = db.tutorials;
 const Comment = db.comments;
+const Tag = db.tag;
 const Op = db.Sequelize.Op;
 
 // Create
@@ -38,7 +39,17 @@ exports.findAll = (req,res) => {
 
     Tutorial.findAll({
         where:condition,
-        include:["comments"]
+        include:[
+            "comments",
+            {
+                model: Tag,
+                as : "tags",
+                attributes : [ "id","name"],
+                through:{
+                    attributes:[]
+                }
+            }
+        ]
     }).then(data=>{
         res.send(data);
     }).catch(err=>{
@@ -46,6 +57,24 @@ exports.findAll = (req,res) => {
             message : err.message || "ada error"
         });
     });
+}
+
+exports.findOne=(req,res)=>{
+    const id = req.params.id
+
+    Tutorial.findByPk(id,{include:["comments"]}).then(data=>{
+        if(data){
+            res.send(data);
+        }else{
+            res.status(404).send(
+                {message : "data tutorial tdk di temukan"}
+            );
+        }
+    }).catch(err=>{
+        res.status(500).send(
+            {message : "error server"}
+        );
+    } )
 }
 
 // update
